@@ -33,7 +33,7 @@ site = Sim$Growth
 H <- SimVal[,1]
 tapply(H, INDEX=site, FUN=shapiro.test)
 
-# if no p > 0.05 then normally distributed and can continue to aov
+# if no p < 0.01 then normally distributed and can continue to aov
 
 Haov = aov(H ~ site)
 summary(Haov)
