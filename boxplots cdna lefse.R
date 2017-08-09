@@ -147,7 +147,7 @@ ki <- k + scale_x_discrete(labels= E_labs)
 
 
 k2 <- ki + theme_bw() +
-  theme(axis.text.x=element_text(angle=-90, size=12, colour="black"), 
+  theme(axis.text.x=element_text(angle=-90, size=13, hjust=0, vjust=0, colour="black"), 
         axis.text.y=element_text(hjust=1, size=14, vjust=0.4, colour="black"),
         axis.title.x=element_blank(),
         axis.title.y=element_text(size=15, colour="black")) +
@@ -158,7 +158,7 @@ k2 <- ki + theme_bw() +
         strip.background =  element_rect(fill = "white"), # remove white from panel tops
         legend.key.size = unit(2, "cm"))
 
-
+#k2 + theme(axis.text.x = element_text(hjust = 0))
 
 #### plotting heading
 
@@ -177,7 +177,7 @@ ki <- k + scale_x_discrete(labels= H_labs)
 
 
 ki + theme_bw() +
-  theme(axis.text.x=element_text(angle=-90, size=12, colour="black"), 
+  theme(axis.text.x=element_text(angle=-90, size=12, hjust=0, vjust=0, colour="black"), 
         axis.text.y=element_text(hjust=1, size=14, vjust=0.4, colour="black"),
         axis.title.x=element_blank(),
         axis.title.y=element_text(size=15, colour="black")) +
@@ -219,7 +219,7 @@ ki <- k + scale_x_discrete(labels= R_labs)
 
 
 ki + theme_bw() +
-  theme(axis.text.x=element_text(angle=-90, size=12, colour="black"), 
+  theme(axis.text.x=element_text(angle=-90, size=12, vjust=0, hjust=0, colour="black"), 
         axis.text.y=element_text(hjust=1, size=14, vjust=0.4, colour="black"),
         axis.title.x=element_blank(),
         axis.title.y=element_text(size=15, colour="black")) +
