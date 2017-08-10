@@ -1,0 +1,93 @@
+## getting out all myxo
+
+# read in otu object made by phyloseq then read out as csv. 
+
+AllT <- read.csv("untrimmedPhyloseqOTU-DNAlime.csv", header = TRUE)
+m_df <- tbl_df(AllT)
+
+# subset by myxococcales
+
+DNA_myxo = subset(m_df, Order=="Myxococcales(100)")
+
+
+head(DNA_myxo)
+# some of these in way too low abund
+# but when i did subset(abund>0.01) it cuts
+# eg heading of one OTU and keeps other two
+# so just made a list of most abund and plotted them. 
+## get list of names of most abundant OTUs in myxo:
+
+# 1 subset to only >0.0002
+DNA_myxo_smallIDs <- subset(DNA_myxo, Abundance >= 0.0002)
+# make a new df from this with only list of OTUs
+DNA_myxo_smallIDsids = DNA_myxo_smallIDs[,2]
+# choose unique so just get 1 entry per OTU
+DNA_myxo_smallIDsO = unique(DNA_myxo_smallIDsids)
+# open this in R, copy and paste into excel.
+# order by a - z then using concatentate make OTU=="OTUx"|
+# and copy and paste below to make another subset of just top 10
+# otus or whatever. 
+
+DNA_myxo_small <- subset(DNA_myxo, OTU=="Otu000133"|
+                            OTU=="Otu000256"|
+                            OTU=="Otu000299"|
+                            OTU=="Otu000382"|
+                            OTU=="Otu000438"|
+                            OTU=="Otu000607"|
+                            OTU=="Otu000614"|
+                            OTU=="Otu000615"|
+                            OTU=="Otu000616"|
+                            OTU=="Otu000635"|
+                            OTU=="Otu000646"|
+                            OTU=="Otu000648"|
+                            OTU=="Otu000843"|
+                            OTU=="Otu001452"|
+                            OTU=="Otu002645"
+                          
+)
+
+
+# now plot 
+
+ggplot(DNA_myxo_small, aes(x=OTU,y=Abundance, fill=GrowthStage)) +
+  geom_boxplot(varwidth=F, colour="black") +
+  theme_bw() +
+  theme(
+    axis.text.x=element_text(angle=90, hjust=1, size=14, vjust=0.4, colour="black"), 
+    axis.text.y=element_text(hjust=1, size=14, vjust=0.4, colour="black"),
+    axis.title.x=element_blank(),
+    axis.title.y=element_text(size=15, colour="black"),
+    legend.title =element_text(size=15, colour="black"),
+    legend.text = element_text(size=14, colour="black"),
+    legend.key.size = unit(2, "cm")
+  ) +
+  labs(fill="  Growth Stage\n") +
+  ylab(expression(paste("Relative abundance of ", italic(" Myxococcales"))))
+
+
+
+## jsut a look to see if all same spp of flavo. 
+# pretty much all genus = Flavobacterium(100)
+
+
+dataFull <- read.table(file="HEADEDconsTax.txt", header=T)
+# this is a full dataframe of ALL my otus with their taxonomy information
+
+dataCut <- read.table(file="flavoOTU.txt", header=T)
+# this is a dataframe of just one column which contains just some of the OTUs
+# that are in the df 'dataFull'
+
+zz <- merge(fotus, dataFull, by = "OTU")
+
+## zz should be a df containing on the OTUS listed in dataCut, but now,
+## those OTUS also have also the taxonomy from teh cons.taxonomy file. 
+
+
+# can then read this out as a csv
+write.csv(zz, file='FlavoTaxaInfo.csv')
+
+
+
+
+
+
