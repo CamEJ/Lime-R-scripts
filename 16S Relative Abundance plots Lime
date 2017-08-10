@@ -1,0 +1,145 @@
+## rel abund plots lime
+library("phyloseq")
+library("ggplot2")
+library("plyr")
+library("vegan")
+library("grid")
+library("directlabels")
+library("knitr")
+library("clustsig")
+library("ellipse")
+library(dplyr)
+library(ggthemr)
+
+#------------------------------- DNA ------------------------------------------#
+
+# these are csvs created by reading stability, cons.tax and metadata file
+# in and making phyloseq obj then melting and reading out. 
+# script to do this is in 'plotting mothur data' folder. 
+# so these are in rel abund already and not trimmed (eg no cutting at 0.01 rel abund) 
+
+AllT <- read.csv("untrimmedPhyloseqOTU-DNAlime.csv", header = TRUE)
+head(AllT)
+
+# run set factor function (found in 'R basics' folder then do this:
+
+AllT[["GrowthStage"]] <- setFactorOrder(AllT[["GrowthStage"]], c("Elongation", "Heading", "Ripening"))
+
+
+# make sure a dframe
+m_df <- tbl_df(AllT)
+
+
+
+# ---------------------------SET COLOURS-----------------------------------------#
+# 21 cols
+RB_cols <- c("black", "firebrick", "orangered4", "darkorange3", 'lightgoldenrod1',
+               "seagreen1", "darkgreen", "mediumturquoise", "darkcyan","orchid",
+               "yellow2", "indianred1",  "red", "orange1", "gold", 
+               "chartreuse3", "lightslateblue","mediumvioletred", "blue4",  
+               "magenta4","deeppink2")
+
+
+
+RBCols1 <- c("#555555", RB_cols)
+# remove previous effects:
+ggthemr_reset()
+# Define colours for your figures with define_palette
+RBCols <- define_palette(
+  swatch = RBCols1, # colours for plotting points and bars
+  gradient = c(lower = RBCols1[1L], upper = RBCols1[2L]), #upper and lower colours for continuous colours
+  background = "white" #defining a grey-ish background 
+)
+# set the theme for your figures:
+ggthemr(RBCols)
+
+#-------------------------------PLOT------------------------------------------#
+
+ggplot(m_df, aes(x=Sample, y=Abundance, fill=Pylum), show_guide=FALSE) + # on purpose wrong spelling of phylum
+  geom_bar(stat="identity") + 
+  facet_wrap(~GrowthStage, scales="free") + 
+  #scale_fill_manual( values = mypal(133) ) +
+  theme_bw() +
+  theme(axis.text.x=element_text(angle=90, hjust=1, size=12, vjust=0.4, colour="black")) +
+  theme(axis.text.y=element_text(hjust=1, size=12, vjust=0.4, colour="black")) +
+  theme(axis.title.x=element_blank()) +
+  labs(y="Relative abundance") +
+  theme(axis.title.y=element_text(size=15, colour="black")) +
+  labs(fill="   \nPhylum\n") +
+  theme(legend.title =element_text(size=15, colour="black"),
+      legend.text = element_text(size=12, colour="black"),
+      strip.text.x = element_text(size = 14, colour = "black"),
+      # change font of facet label
+      strip.background =  element_rect(fill = "white"))+ 
+      # remove white from panel tops
+  guides(fill = guide_legend(override.aes = list(size=8), ncol=1)) +
+scale_fill_discrete(labels = c("Acidobacteria", "Actinobacteria", 
+                          "Armatimonadetes", "Bacteriodetes", "BRC1", "Chlamydiae",
+                          "Chloroflexi", "Crenarchaeota", "Euryarchaeota", 
+                          "Firmicutes", "Fusobacteria", "Gemmatimonadetes", "Nitrospira", "OD1",
+                          "Planctomycetes", "Proteobacteria", "Spirochaetes", "TM7", "Unclassified",
+                          "Verrumicrobia", "WS3"
+                          ))
+                          
+                    
+
+#-------------------------------cDNA------------------------------------------#
+
+
+# 22 cols
+
+RB_cols <- c("black", "firebrick", "orangered4", "darkorange3", 'lightgoldenrod1',
+             "seagreen1", "darkgreen", "mediumturquoise", "darkcyan","orchid",
+             "yellow2", "indianred1",  "red", "orange1", "gold", 
+             "chartreuse3", "deeppink2","mediumvioletred", "grey",
+             "blue4", "lightslateblue", "magenta4")
+             
+# run ggthemr set palette commands as above. 
+
+#--------------------read in data ---------------------------
+
+
+AllT <- read.csv("untrimmedPhyloseqOTU-cDNAlime.csv", header = TRUE)
+head(AllT)
+
+
+AllT[["GrowthStage"]] <- setFactorOrder(AllT[["GrowthStage"]], c("Elongation", "Heading", "Ripening"))
+
+
+# make sure a dframe
+m_df <- tbl_df(AllT)
+
+
+#-------------------------------PLOT------------------------------------------#
+
+ggplot(m_df, aes(x=Sample, y=Abundance, fill=Phylum), show_guide=FALSE) + 
+  geom_bar(stat="identity") + 
+  facet_wrap(~GrowthStage, scales="free") + 
+  theme_bw() +
+  theme(axis.text.x=element_text(angle=90, hjust=1, size=12, vjust=0.4, colour="black")) +
+  theme(axis.text.y=element_text(hjust=1, size=12, vjust=0.4, colour="black")) +
+  theme(axis.title.x=element_blank()) +
+  labs(y="Relative abundance") +
+  theme(axis.title.y=element_text(size=15, colour="black")) +
+  labs(fill="   \nPhylum\n") +
+  theme(legend.title =element_text(size=15, colour="black"),
+        legend.text = element_text(size=12, colour="black"),
+        strip.text.x = element_text(size = 14, colour = "black"),
+        # change font of facet label
+        strip.background =  element_rect(fill = "white"))+ 
+  # remove white from panel tops
+  guides(fill = guide_legend(override.aes = list(size=8), ncol=1)) +
+scale_fill_discrete(labels = c("Acidobacteria", "Actinobacteria", 
+                               "Armatimonadetes", "Bacteriodetes", "BRC1", "Chlamydiae",
+                               "Chloroflexi", "Crenarchaeota", "Deinococcus thermus", 
+                               "Euryarchaeota", "Firmicutes", "Gemmatimonadetes", 
+                               "Nitrospira", "OD1", "Planctomycetes", "Proteobacteria", 
+                               "Spirochaetes", "Tenericutes", "TM7", "Unclassified",
+                               "Verrumicrobia", "WS3"))
+                               
+ # note the first time you plot you'll have to leave off last argument of
+ # scale-fill-discrete() so you can see which phylum are plotted in what order
+ # then you can make c() with prettier names, ie minus that annoying (100) etc.
+ 
+ # export. 
+ 
