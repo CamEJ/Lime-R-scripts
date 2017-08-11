@@ -5,7 +5,7 @@
 # ripening = goldenrod1
 # rest of cols just extras
 
-dark_cols <- c("springgreen1", "darkgreen", "goldenrod1", "black", "darkorange3", "blue4", 
+dark_cols <- c("olivedrab3", "darkgreen", "goldenrod1", "black", "darkorange3", "blue4", 
                "lightslateblue", "seagreen1", "indianred1", 'lightgoldenrod1', 
                "chartreuse2", "mediumturquoise", "yellow1", "orchid", "deeppink2", 
                "magenta4")
