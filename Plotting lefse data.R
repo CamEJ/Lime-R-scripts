@@ -2,7 +2,7 @@
 
 # read in data with lefse vals > 3 and p < 0.01
 # in excel i had ordered this data accroding to treatment (ie sample day)
-
+library(ggplot2)
 
 LF <- read.table("Lefse-cDNAwTax.txt", header = TRUE, sep="\t" )
 head(LF)
