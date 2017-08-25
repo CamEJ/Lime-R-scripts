@@ -1,18 +1,32 @@
-# 
-
+# checking for statistically sig difference in diversity
+# between samples grouped according to tmt. 
 
 
 ## or via method in page 256 of community ecology (gardener)
-# using simpVals from mothur:
+# using simpsons Vals from mothur:
 
-Sim = read.table("DNA-grouping.txt", sep = "\t", row.names=1, header=T)
-SimVal = read.table("DNA-invSimpVals.txt", sep = "\t", row.names=1, header=T)
+Sim = read.table("DNA-grouping.txt", sep = "\t", row.names=1, header=T) # a file with sample id as col one and treatment in col2
+SimVal = read.table("DNA-invSimpVals.txt", sep = "\t", row.names=1, header=T) 
 
+head(SimVal) # eg (from cDNA file actually) of what file looks like. remember row.names =1 so col1 therefore is simp vals. 
+
+# invsimpson
+# D1Highplot1a   314.2937
+# D1Highplot1b   337.2637
+# D1Highplot2a   265.8085
+# D1Highplot2b   270.5671
+# D1Highplot3a   267.3590
+# D1Highplot3b   259.0361
+
+# define treatments in my case, a column called growth which shows which plant growth stage my samples are from
 site = Sim$Growth
+# define simp vals. 
 
 H <- SimVal[,1]
 tapply(H, INDEX=site, FUN=shapiro.test)
+# if no p > 0.05 then normally distributed and can continue to aov
 
+# Run AOV:
 Haov = aov(H ~ site)
 summary(Haov)
 
@@ -22,14 +36,7 @@ summary(Haov)
 Sim = read.table("cDNA-invSimp-grouping.txt", sep = "\t", row.names=1, header=T)
 SimVal = read.table("cDNA-invSimp.txt", sep = "\t", row.names=1, header=T)
 
-head(SimVal)
-# invsimpson
-# D1Highplot1a   314.2937
-# D1Highplot1b   337.2637
-# D1Highplot2a   265.8085
-# D1Highplot2b   270.5671
-# D1Highplot3a   267.3590
-# D1Highplot3b   259.0361
+
 
 site = Sim$Growth
 
