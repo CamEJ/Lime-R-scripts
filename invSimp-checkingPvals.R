@@ -1,0 +1,133 @@
+# 
+
+
+
+## or via method in page 256 of community ecology (gardener)
+# using simpVals from mothur:
+
+Sim = read.table("DNA-grouping.txt", sep = "\t", row.names=1, header=T)
+SimVal = read.table("DNA-invSimpVals.txt", sep = "\t", row.names=1, header=T)
+
+site = Sim$Growth
+
+H <- SimVal[,1]
+tapply(H, INDEX=site, FUN=shapiro.test)
+
+Haov = aov(H ~ site)
+summary(Haov)
+
+
+##### now for cDNA
+
+Sim = read.table("cDNA-invSimp-grouping.txt", sep = "\t", row.names=1, header=T)
+SimVal = read.table("cDNA-invSimp.txt", sep = "\t", row.names=1, header=T)
+
+head(SimVal)
+# invsimpson
+# D1Highplot1a   314.2937
+# D1Highplot1b   337.2637
+# D1Highplot2a   265.8085
+# D1Highplot2b   270.5671
+# D1Highplot3a   267.3590
+# D1Highplot3b   259.0361
+
+site = Sim$Growth
+
+H <- SimVal[,1]
+tapply(H, INDEX=site, FUN=shapiro.test)
+
+
+# if no p > 0.05 then normally distributed and can continue to aov
+
+Haov = aov(H ~ site)
+summary(Haov)
+
+# p is 0.00393 so carry out Tukey
+
+TukeyHSD(Haov)
+
+# ouput:
+# diff         lwr       upr     p adj
+# Heading-Elongation   55.62697   -1.374036 112.62798 0.0570952
+# Ripening-Elongation -24.51588  -81.516888  32.48513 0.5539965
+# Ripening-Heading    -80.14285 -136.216953 -24.06875 0.0033444
+
+boxplot(H ~ site)
+
+
+## Another option is to do via simboot() but I couldnt get it to work
+# fully, here is where I got to so far
+
+
+library(simboot)
+# on eg data provided by simboot()
+load("Bacteria.rda")
+
+k = mcpHill(dataf=Bacteria[,2:24], fact=Bacteria[,1], boots=50, qval=c(0,1,2))
+
+## output
+# > k
+# q p-value
+# 2 - 1 0    0.46
+# 2 - 1 1    0.00
+# 2 - 1 2    0.02
+
+# on a small set of my data
+
+Sim = read.table("SimbootTestOTu.txt", sep = "\t", row.names=1, header=T)
+
+simT <- t(Sim)
+
+simTM <-  as.data.frame(simT)
+
+# ## import metadata file
+metaFile = read.table('cDNA_metadata.txt', header=T, sep='\t')
+rownames(metaFile) = metaFile[,1]
+metaFile = metaFile[,2:3]
+head(metaFile)
+
+# add grouping variable
+simTM$treatment <- metaFile$GrowthStage
+
+# now run where dataf is name of count table
+# fact is column of dataf where your grouping variable is
+# those other two things i left as default
+
+hill <- mcpHill(dataf=simTM[,1:30], fact=simTM[,31], boots=50, qval=c(0,1,2))
+
+#  Output:
+> hill
+# q p-value
+# 2 - 1 0    0.00
+# 3 - 1 0    0.00
+# 2 - 1 1    0.10
+# 3 - 1 1    0.88
+# 2 - 1 2    0.28
+# 3 - 1 2    1.00
+
+
+# now trying on full data
+
+# import shared file
+d = read.table("table.from_biom_w_Tax2.txt", sep = "\t", row.names=1, header=T)
+
+d = read.table("table.from_biom_w_Tax2.txt", sep = "\t", row.names=1, header=T)
+
+## import metadata file
+metaFile = read.table('cDNA_metadata.txt', header=T, sep='\t')
+rownames(metaFile) = metaFile[,1]
+metaFile = metaFile[,2:3]
+head(metaFile)
+
+# transforming otu table to make it how simboot wants(ie same
+# as thier example data in Bacteria.rda)
+head(d)
+tD <- t(d)
+
+head(tD)
+## got to here
+
+
+simTM$treatment <- metaFile$GrowthStage
+
+
