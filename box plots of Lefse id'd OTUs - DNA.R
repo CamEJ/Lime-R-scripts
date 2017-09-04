@@ -1,12 +1,14 @@
 ## box plots of Lefse id'd OTUs - DNA
+library(ggplot2)
 
-
-
+# read in OTU table (made in phyloseq; also has metadata and tax info)
 yy <- read.csv(file='untrimmedPhyloseqOTU-DNAlime.csv', header=T )
 
-yy_df <- as_df(yy)
-# get out all lefse's
-# made this list of otus using concatenate in excel
+# make sure it's a df. 
+#yy_df <- as_df(yy)
+# get out the OTUs identified by lefse as being differentially abundant.  
+
+# made this list of otus using concatenate in excel to be faster with OTU==""|
 
 microSubRelLefse = subset(yy, OTU=="Otu000086"|
                             OTU=="Otu000104"|
@@ -41,14 +43,9 @@ microSubRelLefse = subset(yy, OTU=="Otu000086"|
 
 write.csv(microSubRelLefse, file='microSubRelLefse-DNA_ZERO.csv')
 
-## read into excel and added extra column saying which growth stage
-# each otu was discriminatory for
-#read back in 
+## write it out so if you need to do this again you don't need to waste
+# time reading your whole otu table. 
 
-pp <- read.csv("microSubRelLefse-DNA_ZERO.csv", header = TRUE)
-
-# text file with otu ids and the growth phase for which each is 
-# discriminatory
 dt <- read.table("lefse-OTUsandDiscrim.txt", header = TRUE)
 head(dt) # looks like this
 # OTU  Discrim
@@ -61,16 +58,29 @@ head(dt) # looks like this
 
 ## now using this i can add an extra column to my lefse trimmed OTU table
 ## that i will call 'Discim' and it will say which growth phase that OTU 
-# is discriminitive for. 
+# is differentially abundant in. 
 
 
 pp$Discrim <- dt$Discrim[match(pp$OTU, dt$OTU)]
 
-# set factor order .
+# fun the set factor order function
+# found in github .
 
 pp[["GrowthStage"]] <- setFactorOrder(pp[["GrowthStage"]], c("Elongation", "Heading", "Ripening"))
 
 pp[["Discrim"]] <- setFactorOrder(pp[["Discrim"]], c("elongation", "heading", "ripening"))
+
+
+# i have 3 different timepoints and therefore end up with 
+# 3 diff box plots. Initially tried to plot these 3 with facet_wrapping
+# by my timepoint - but, as i had a diff no of OTUs id'd per timepoint
+# the boxes in each of the 3 plot were a diff width and it looked ugly.
+
+# So i subset my data by the phase for which they are identifed as
+# being differenitally abundant, and plot these 3 separately...
+
+# subset for OTUs that were highly abundant in elongation
+# based on my column that contains this info and is called 'Discrim'
 
 yy_E = subset(pp, Discrim=="elongation")
 
@@ -82,11 +92,17 @@ yy_R = subset(pp, Discrim=="ripening")
 
 
 #### plotting elongation
+# this will show the relative abundance of OTUs (id'd as differentially
+# during the elongation phase) for all three phases so we can see what's
+# actually happening. 
+
 
 k <- ggplot(yy_E, aes(x=OTU,y=Abundance, fill=GrowthStage)) +
   geom_boxplot(colour="black")
 k
 
+# vector of labelling info. can leave this out if you
+# want to see OTU instead of phylotype. 
 
 E_labs <- c("Sphingobacteriales",
             "Burkholderiales",
@@ -104,8 +120,10 @@ E_labs <- c("Sphingobacteriales",
             "Sphingobacteriales"
 )
 
+# add the labels to your plot
 ki <- k + scale_x_discrete(labels= E_labs)
 
+# make it pretty. 
 
 k2 <- ki + theme_bw() +
   theme(axis.text.x=element_text(angle=-90, size=13, hjust=0, vjust=0, colour="black"), 
@@ -115,8 +133,6 @@ k2 <- ki + theme_bw() +
   labs(fill="  Growth Stage\n", y = "Relative abundance\n") +
   theme(legend.title =element_text(size=15, colour="black"),
         legend.text = element_text(size=14, colour="black"), 
-        strip.text.x = element_text(size = 18, colour = "black"),# change font of facet label
-        strip.background =  element_rect(fill = "white"), # remove white from panel tops
         legend.key.size = unit(2, "cm"))
 
 #k2 + theme(axis.text.x = element_text(hjust = 0))
@@ -189,4 +205,8 @@ ki + theme_bw() +
         legend.key.size = unit(2, "cm"))
 
 
+
+## export all three boxplots to the same height, & adjust width
+# in export to make the width of the actual boxes look the same
+# then in a ppt you can put them together & get same effect as facet_wrap
 
